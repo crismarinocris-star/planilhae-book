@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planilha Premium - Controle de Cultivo Hidropônico</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2d5016 0%, #3d6b1f 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .tabs {
+            display: flex;
+            background: #f8f8f5;
+            border-bottom: 2px solid #ddd;
+            overflow-x: auto;
+        }
+        
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        
+        .tab:hover {
+            background: rgba(45, 80, 22, 0.1);
+        }
+        
+        .tab.active {
+            background: white;
+            color: #2d5016;
+            border-bottom: 3px solid #2d5016;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Dashboard */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #2d5016 0%, #3d6b1f 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .stat-card h3 {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .stat-card .value {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-card .label {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .chart-title {
+            font-size: 18px;
+            color: #2d5016;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        thead {
+            background: #2d5016;
+            color: white;
+        }
+        
+        th {
+            padding: 12px;
+            text-align: left;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        tbody tr:hover {
+            background: #f8f8f5;
+        }
+        
+        input, select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            width: 100%;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #2d5016;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .status-germinando {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-crescendo {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .status-pronto {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-colhido {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #00a878;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #008f68;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2d5016;
+            font-size: 14px;
+        }
+        
+        .calculator-result {
+            background: #f0fff4;
+            border-left: 5px solid #00a878;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+        
+        .calculator-result h3 {
+            color: #2d5016;
+            margin-bottom: 15px;
+        }
+        
+        .calculator-result .big-value {
+            font-size: 42px;
+            font-weight: bold;
+            color: #00a878;
+            margin: 10px 0;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-warning {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            color: #856404;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            border-left: 5px solid #28a745;
+            color: #155724;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #eee;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00a878, #2d5016);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+            transition: width 0.3s;
+        }
+        
+        .instructions {
+            background: #f8f8f5;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 5px solid #2d5016;
+        }
+        
+        .instructions h3 {
+            color: #2d5016;
+            margin-bottom: 10px;
+        }
+        
+        .instructions ul {
+            margin-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="container">
+        <div class="header">
+            <h1>🌱 Planilha Premium de Controle Hidropônico</h1>
+            <p>Gerencie seu cultivo, calcule economia e acompanhe resultados</p>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="openTab('dashboard')">📊 Dashboard</button>
+            <button class="tab" onclick="openTab('plantio')">🌱 Controle de Plantio</button>
+            <button class="tab" onclick="openTab('economia')">💰 Economia</button>
+            <button class="tab" onclick="openTab('manutencao')">🔧 Manutenção</button>
+            <button class="tab" onclick="openTab('colheitas')">📝 Colheitas</button>
+            <button class="tab" onclick="openTab('roi')">📈 ROI</button>
+        </div>
+        
+        <!-- DASHBOARD -->
+        <div id="dashboard" class="tab-content active">
+            <div class="instructions">
+                <h3>📋 Como Usar Esta Planilha</h3>
+                <ul>
+                    <li><strong>Dashboard:</strong> Visualize resumo geral do seu cultivo</li>
+                    <li><strong>Controle de Plantio:</strong> Registre cada planta e acompanhe o desenvolvimento</li>
+                    <li><strong>Economia:</strong> Calcule quanto você está economizando vs mercado</li>
+                    <li><strong>Manutenção:</strong> Organize tarefas e nunca esqueça nada</li>
+                    <li><strong>Colheitas:</strong> Registre suas colheitas para análise</li>
+                    <li><strong>ROI:</strong> Calcule em quanto tempo seu investimento retorna</li>
+                </ul>
+            </div>
+            
+            <div class="dashboard-grid">
+                <div class="stat-card">
+                    <h3>Plantas Ativas</h3>
+                    <div class="value" id="plantasAtivas">0</div>
+                    <div class="label">em cultivo</div>
+                </div>
+                
+                <div class="stat-card">
+                    <h3>Colhidas Este Mês</h3>
+                    <div class="value" id="colhidasMes">0</div>
+                    <div class="label">plantas</div>
+                </div>
+                
+                <div class="stat-card">
+                    <h3>Economia Mensal</h3>
+                    <div class="value" id="economiaMensal">R$ 0</div>
+                    <div class="label">vs mercado</div>
+                </div>
+                
+                <div class="stat-card">
+                    <h3>Taxa de Sucesso</h3>
+                    <div class="value" id="taxaSucesso">0%</div>
+                    <div class="label">plantas bem-sucedidas</div>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-title">📈 Economia nos Últimos 6 Meses</div>
+                <p style="color: #666; font-size: 14px; margin-bottom: 20px;">
+                    Acompanhe quanto você economizou comparado ao preço do mercado
+                </p>
+                <canvas id="economiaChart" style="max-height: 300px;"></canvas>
+                <div style="margin-top: 20px; padding: 15px; background: #f8f8f5; border-radius: 5px;">
+                    <strong>💡 Dica:</strong> Registre suas colheitas na aba "Colheitas" para ver este gráfico preenchido automaticamente!
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-title">🌱 Status das Plantas Atuais</div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 48px; font-weight: bold; color: #856404;">0</div>
+                        <div style="color: #666;">Germinando</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 48px; font-weight: bold; color: #0c5460;">0</div>
+                        <div style="color: #666;">Crescendo</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 48px; font-weight: bold; color: #155724;">0</div>
+                        <div style="color: #666;">Prontas</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- CONTROLE DE PLANTIO -->
+        <div id="plantio" class="tab-content">
+            <h2 style="color: #2d5016; margin-bottom: 20px;">🌱 Controle de Plantio</h2>
+            
+            <div class="alert alert-success">
+                <strong>✓ Como funciona:</strong> Adicione cada planta que você iniciar. A planilha calcula automaticamente 
+                a data prevista de colheita e te avisa quando estiver pronta!
+            </div>
+            
+            <div style="background: #f8f8f5; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                <h3 style="color: #2d5016; margin-bottom: 15px;">➕ Adicionar Nova Planta</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div class="form-group">
+                        <label>Data de Plantio</label>
+                        <input type="date" id="dataPlantio">
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de Planta</label>
+                        <select id="tipoPlanta">
+                            <option value="">Selecione...</option>
+                            <option value="Alface|30">Alface (30 dias)</option>
+                            <option value="Rúcula|25">Rúcula (25 dias)</option>
+                            <option value="Manjericão|40">Manjericão (40 dias)</option>
+                            <option value="Hortelã|35">Hortelã (35 dias)</option>
+                            <option value="Tomate-Cereja|60">Tomate-Cereja (60 dias)</option>
+                            <option value="Morango|90">Morango (90 dias)</option>
+                            <option value="Salsinha|45">Salsinha (45 dias)</option>
+                            <option value="Cebolinha|40">Cebolinha (40 dias)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Sistema</label>
+                        <select id="sistemaPlantio">
+                            <option value="DWC">DWC</option>
+                            <option value="NFT">NFT</option>
+                            <option value="Kratky">Kratky</option>
+                            <option value="Vertical">Vertical</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="statusPlanta">
+                            <option value="Germinando">🌱 Germinando</option>
+                            <option value="Crescendo">🌿 Crescendo</option>
+                            <option value="Pronto">✅ Pronto</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="adicionarPlanta()">➕ Adicionar Planta</button>
+            </div>
+            
+            <table id="tabelaPlantas">
+                <thead>
+                    <tr>
+                        <th>Data Plantio</th>
+                        <th>Planta</th>
+                        <th>Sistema</th>
+                        <th>Dias Plantado</th>
+                        <th>Previsão Colheita</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="corpoPlantas">
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 40px; color: #999;">
+                            Nenhuma planta registrada. Adicione sua primeira planta acima! 🌱
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- ECONOMIA -->
+        <div id="economia" class="tab-content">
+            <h2 style="color: #2d5016; margin-bottom: 20px;">💰 Calculadora de Economia</h2>
+            
+            <div class="alert alert-success">
+                <strong>💡 Como funciona:</strong> Registre o que você colheu e compare com o preço do mercado. 
+                A planilha calcula automaticamente sua economia mensal!
+            </div>
+            
+            <div style="background: #f8f8f5; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                <h3 style="color: #2d5016; margin-bottom: 15px;">🧮 Calcular Economia</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div class="form-group">
+                        <label>Produto</label>
+                        <select id="produtoEconomia">
+                            <option value="">Selecione...</option>
+                            <option value="Alface|4">Alface (R$ 4/unidade)</option>
+                            <option value="Rúcula|5">Rúcula (R$ 5/maço)</option>
+                            <option value="Manjericão|6">Manjericão (R$ 6/maço)</option>
+                            <option value="Hortelã|5">Hortelã (R$ 5/maço)</option>
+                            <option value="Tomate|8">Tomate (R$ 8/kg)</option>
+                            <option value="Morango|25">Morango (R$ 25/kg)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Quantidade Colhida</label>
+                        <input type="number" id="quantidadeColhida" step="0.1" placeholder="Ex: 0.5">
+                    </div>
+                    <div class="form-group">
+                        <label>Unidade</label>
+                        <select id="unidadeColhida">
+                            <option value="kg">kg</option>
+                            <option value="maço">maço</option>
+                            <option value="unidade">unidade</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="calcularEconomia()">💰 Calcular</button>
+            </div>
+            
+            <div class="calculator-result" id="resultadoEconomia" style="display: none;">
+                <h3>✅ Resultado</h3>
+                <p>Você colheu <strong id="qtdColhidaTexto"></strong> de <strong id="produtoColhidoTexto"></strong></p>
+                <div class="big-value" id="economiaValor">R$ 0,00</div>
+                <p style="color: #666;">economizados vs mercado</p>
+            </div>
+            
+            <div style="margin-top: 40px;">
+                <h3 style="color: #2d5016; margin-bottom: 15px;">📊 Resumo Mensal</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Produto</th>
+                            <th>Quantidade</th>
+                            <th>Preço Mercado</th>
+                            <th>Economia</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resumoEconomia">
+                        <tr>
+                            <td colspan="4" style="text-align: center; padding: 30px; color: #999;">
+                                Nenhum cálculo registrado ainda
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div style="margin-top: 20px; padding: 20px; background: #2d5016; color: white; border-radius: 10px; text-align: center;">
+                    <h3 style="font-size: 18px; margin-bottom: 10px;">💰 Economia Total Este Mês</h3>
+                    <div style="font-size: 48px; font-weight: bold; color: #ffd700;">R$ <span id="economiaTotalMes">0,00</span></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- MANUTENÇÃO -->
+        <div id="manutencao" class="tab-content">
+            <h2 style="color: #2d5016; margin-bottom: 20px;">🔧 Cronograma de Manutenção</h2>
+            
+            <div class="alert alert-warning">
+                <strong>⚠️ Importante:</strong> A manutenção regular é essencial para o sucesso do cultivo. 
+                Use esta aba para nunca esquecer nenhuma tarefa!
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tarefa</th>
+                        <th>Frequência</th>
+                        <th>Última Execução</th>
+                        <th>Próxima Data</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Trocar solução nutritiva</td>
+                        <td>7 dias</td>
+                        <td><input type="date" id="dataTrocaSolucao"></td>
+                        <td id="proximaTrocaSolucao">-</td>
+                        <td><span class="status-badge status-pronto">✅ Em dia</span></td>
+                        <td><button class="btn btn-secondary" style="font-size: 12px; padding: 5px 10px;">Atualizar</button></td>
+                    </tr>
+                    <tr>
+                        <td>Limpar sistema</td>
+                        <td>15 dias</td>
+                        <td><input type="date" id="dataLimpeza"></td>
+                        <td id="proximaLimpeza">-</td>
+                        <td><span class="status-badge status-pronto">✅ Em dia</span></td>
+                        <td><button class="btn btn-secondary" style="font-size: 12px; padding: 5px 10px;">Atualizar</button></td>
+                    </tr>
+                    <tr>
+                        <td>Verificar pH</td>
+                        <td>3 dias</td>
+                        <td><input type="date" id="dataVerificacaoPH"></td>
+                        <td id="proximaVerificacaoPH">-</td>
+                        <td><span class="status-badge status-pronto">✅ Em dia</span></td>
+                        <td><button class="btn btn-secondary" style="font-size: 12px; padding: 5px 10px;">Atualizar</button></td>
+                    </tr>
+                    <tr>
+                        <td>Verificar CE (condutividade)</td>
+                        <td>5 dias</td>
+                        <td><input type="date" id="dataVerificacaoCE"></td>
+                        <td id="proximaVerificacaoCE">-</td>
+                        <td><span class="status-badge status-pronto">✅ Em dia</span></td>
+                        <td><button class="btn btn-secondary" style="font-size: 12px; padding: 5px 10px;">Atualizar</button></td>
+                    </tr>
+                    <tr>
+                        <td>Completar água</td>
+                        <td>2 dias</td>
+                        <td><input type="date" id="dataCompletarAgua"></td>
+                        <td id="proximaCompletarAgua">-</td>
+                        <td><span class="status-badge status-pronto">✅ Em dia</span></td>
+                        <td><button class="btn btn-secondary" style="font-size: 12px; padding: 5px 10px;">Atualizar</button></td>
+                    </tr>
+                    <tr>
+                        <td>Inspeção de pragas</td>
+                        <td>7 dias</td>
+                        <td><input type="date" id="dataInspecaoPragas"></td>
+                        <td id="proximaInspecaoPragas">-</td>
+                        <td><span class="status-badge status-pronto">✅ Em dia</span></td>
+                        <td><button class="btn btn-secondary" style="font-size: 12px; padding: 5px 10px;">Atualizar</button></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div style="margin-top: 30px; padding: 20px; background: #f8f8f5; border-radius: 10px;">
+                <h3 style="color: #2d5016; margin-bottom: 15px;">📝 Notas de Manutenção</h3>
+                <textarea style="width: 100%; min-height: 150px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; font-family: inherit;" 
+                          placeholder="Anote observações importantes sobre a manutenção do seu sistema..."></textarea>
+                <button class="btn btn-primary" style="margin-top: 10px;">💾 Salvar Notas</button>
+            </div>
+        </div>
+        
+        <!-- COLHEITAS -->
+        <div id="colheitas" class="tab-content">
+            <h2 style="color: #2d5016; margin-bottom: 20px;">📝 Registro de Colheitas</h2>
+            
+            <div class="alert alert-success">
+                <strong>📊 Análise:</strong> Registrar suas colheitas ajuda a entender o que funciona melhor 
+                e a calcular sua economia real!
+            </div>
+            
+            <div style="background: #f8f8f5; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                <h3 style="color: #2d5016; margin-bottom: 15px;">➕ Registrar Colheita</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div class="form-group">
+                        <label>Data da Colheita</label>
+                        <input type="date" id="dataColheita">
+                    </div>
+                    <div class="form-group">
+                        <label>Planta</label>
+                        <input type="text" id="plantaColhida" placeholder="Ex: Alface Crespa">
+                    </div>
+                    <div class="form-group">
+                        <label>Quantidade</label>
+                        <input type="text" id="quantidadeColhidaReg" placeholder="Ex: 2 pés, 500g">
+                    </div>
+                    <div class="form-group">
+                        <label>Qualidade</label>
+                        <select id="qualidadeColheita">
+                            <option value="Excelente">⭐⭐⭐⭐⭐ Excelente</option>
+                            <option value="Boa">⭐⭐⭐⭐ Boa</option>
+                            <option value="Regular">⭐⭐⭐ Regular</option>
+                            <option value="Ruim">⭐⭐ Ruim</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Observações</label>
+                    <textarea id="observacoesColheita" style="width: 100%; min-height: 80px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-family: inherit;" 
+                              placeholder="Ex: Folhas bem crocantes, sabor adocicado, cresceu mais rápido que o esperado..."></textarea>
+                </div>
+                <button class="btn btn-primary" onclick="registrarColheita()">📝 Registrar</button>
+            </div>
+            
+            <table id="tabelaColheitas">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Planta</th>
+                        <th>Quantidade</th>
+                        <th>Qualidade</th>
+                        <th>Observações</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="corpoColheitas">
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 40px; color: #999;">
+                            Nenhuma colheita registrada ainda. Registre sua primeira colheita acima! 🌱
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- ROI -->
+        <div id="roi" class="tab-content">
+            <h2 style="color: #2d5016; margin-bottom: 20px;">📈 Calculadora de ROI (Retorno do Investimento)</h2>
+            
+            <div class="alert alert-success">
+                <strong>💡 Descubra:</strong> Em quanto tempo seu investimento em hidroponia se paga!
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;">
+                <div style="background: #f8f8f5; padding: 25px; border-radius: 10px;">
+                    <h3 style="color: #2d5016; margin-bottom: 20px;">💰 Investimento Inicial</h3>
+                    
+                    <div class="form-group">
+                        <label>Sistema Hidropônico</label>
+                        <input type="number" id="custoSistema" placeholder="Ex: 200" value="200">
+                        <small style="color: #666;">Bomba, reservatório, copos, etc.</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Iluminação (se necessário)</label>
+                        <input type="number" id="custoIluminacao" placeholder="Ex: 150" value="0">
+                        <small style="color: #666;">LED grow, timer, etc.</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Sementes e Mudas</label>
+                        <input type="number" id="custoSementes" placeholder="Ex: 50" value="50">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Outros (opcional)</label>
+                        <input type="number" id="custoOutros" placeholder="Ex: 100" value="0">
+                        <small style="color: #666;">Medidores, ferramentas, etc.</small>
+                    </div>
+                    
+                    <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 5px; text-align: center;">
+                        <div style="font-size: 14px; color: #666; margin-bottom: 5px;">INVESTIMENTO TOTAL</div>
+                        <div style="font-size: 32px; font-weight: bold; color: #2d5016;">R$ <span id="investimentoTotal">250,00</span></div>
+                    </div>
+                </div>
+                
+                <div style="background: #f8f8f5; padding: 25px; border-radius: 10px;">
+                    <h3 style="color: #2d5016; margin-bottom: 20px;">📊 Custos e Economia Mensais</h3>
+                    
+                    <div class="form-group">
+                        <label>Solução Nutritiva/mês</label>
+                        <input type="number" id="custoNutrientes" placeholder="Ex: 30" value="30">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Energia Elétrica/mês</label>
+                        <input type="number" id="custoEnergia" placeholder="Ex: 20" value="20">
+                        <small style="color: #666;">Bomba + iluminação</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Água/mês</label>
+                        <input type="number" id="custoAgua" placeholder="Ex: 5" value="5">
+                    </div>
+                    
+                    <div style="margin-top: 20px; padding: 15px; background: #fff3cd; border-radius: 5px; text-align: center;">
+                        <div style="font-size: 14px; color: #856404; margin-bottom: 5px;">CUSTO MENSAL</div>
+                        <div style="font-size: 32px; font-weight: bold; color: #856404;">R$ <span id="custoMensal">55,00</span></div>
+                    </div>
+                    
+                    <div class="form-group" style="margin-top: 20px;">
+                        <label>Economia Mensal Estimada</label>
+                        <input type="number" id="economiaMensalEst" placeholder="Ex: 200" value="200">
+                        <small style="color: #666;">Quanto economiza vs comprar no mercado</small>
+                    </div>
+                    
+                    <div style="margin-top: 15px; padding: 15px; background: #d4edda; border-radius: 5px; text-align: center;">
+                        <div style="font-size: 14px; color: #155724; margin-bottom: 5px;">LUCRO LÍQUIDO MENSAL</div>
+                        <div style="font-size: 32px; font-weight: bold; color: #155724;">R$ <span id="lucroLiquido">145,00</span></div>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" style="width: 100%; font-size: 18px; padding: 15px;" onclick="calcularROI()">
+                🧮 CALCULAR RETORNO DO INVESTIMENTO
+            </button>
+            
+            <div class="calculator-result" id="resultadoROI" style="display: none; margin-top: 30px;">
+                <h3 style="font-size: 24px; margin-bottom: 20px;">✅ Resultado da Análise</h3>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                    <div style="text-align: center; padding: 20px; background: white; border-radius: 10px;">
+                        <div style="font-size: 14px; color: #666; margin-bottom: 10px;">RETORNO EM</div>
+                        <div class="big-value" id="mesesRetorno">0</div>
+                        <div style="font-size: 18px; color: #666;">meses</div>
+                    </div>
+                    
+                    <div style="text-align: center; padding: 20px; background: white; border-radius: 10px;">
+                        <div style="font-size: 14px; color: #666; margin-bottom: 10px;">ECONOMIA EM 1 ANO</div>
+                        <div class="big-value" id="economiaAnual">R$ 0</div>
+                    </div>
+                    
+                    <div style="text-align: center; padding: 20px; background: white; border-radius: 10px;">
+                        <div style="font-size: 14px; color: #666; margin-bottom: 10px;">RETORNO SOBRE INVESTIMENTO</div>
+                        <div class="big-value" id="percentualROI">0%</div>
+                    </div>
+                </div>
+                
+                <div style="background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                    <h4 style="color: #2d5016; margin-bottom: 15px;">📈 Projeção de Retorno</h4>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressROI" style="width: 0%">0%</div>
+                    </div>
+                    <p style="margin-top: 10px; color: #666; font-size: 14px;" id="textoProgresso"></p>
+                </div>
+                
+                <div style="background: #f0fff4; padding: 20px; border-radius: 10px; border-left: 5px solid #00a878;">
+                    <h4 style="color: #2d5016; margin-bottom: 15px;">💰 Análise Detalhada</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin-bottom: 10px;">✓ <strong>Investimento inicial:</strong> R$ <span id="detInvestimento"></span></li>
+                        <li style="margin-bottom: 10px;">✓ <strong>Custo operacional mensal:</strong> R$ <span id="detCustoMensal"></span></li>
+                        <li style="margin-bottom: 10px;">✓ <strong>Economia mensal:</strong> R$ <span id="detEconomiaMensal"></span></li>
+                        <li style="margin-bottom: 10px;">✓ <strong>Lucro líquido mensal:</strong> R$ <span id="detLucroMensal"></span></li>
+                        <li style="margin-bottom: 10px;">✓ <strong>Seu investimento se paga em:</strong> <span id="detMesesRetorno"></span> meses</li>
+                        <li style="margin-bottom: 10px;">✓ <strong>Após 1 ano:</strong> Economia total de R$ <span id="detEconomiaAno"></span></li>
+                        <li>✓ <strong>ROI em 12 meses:</strong> <span id="detROIAno"></span>%</li>
+                    </ul>
+                </div>
+                
+                <div style="margin-top: 20px; padding: 20px; background: #fff3cd; border-radius: 10px; border-left: 5px solid #ffc107;">
+                    <strong>💡 Dica:</strong> Esses cálculos são estimativas baseadas nos valores que você informou. 
+                    Seus resultados reais podem variar dependendo das plantas cultivadas, eficiência do sistema, 
+                    e preços locais do mercado. Use a aba "Economia" para acompanhar seus resultados reais!
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // NAVEGAÇÃO ENTRE ABAS
+        function openTab(tabName) {
+            const tabs = document.querySelectorAll('.tab');
+            const contents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => tab.classList.remove('active'));
+            contents.forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+        
+        // DADOS ARMAZENADOS
+        let plantas = [];
+        let colheitas = [];
+        let economia = [];
+        
+        // ADICIONAR PLANTA
+        function adicionarPlanta() {
+            const dataPlantio = document.getElementById('dataPlantio').value;
+            const tipoPlanta = document.getElementById('tipoPlanta').value;
+            const sistema = document.getElementById('sistemaPlantio').value;
+            const status = document.getElementById('statusPlanta').value;
+            
+            if (!dataPlantio || !tipoPlanta) {
+                alert('Preencha a data e o tipo de planta!');
+                return;
+            }
+            
+            const [nome, dias] = tipoPlanta.split('|');
+            const diasParaColheita = parseInt(dias);
+            
+            const dataColheitaPrevisao = new Date(dataPlantio);
+            dataColheitaPrevisao.setDate(dataColheitaPrevisao.getDate() + diasParaColheita);
+            
+            const planta = {
+                id: Date.now(),
+                dataPlantio: dataPlantio,
+                nome: nome,
+                diasParaColheita: diasParaColheita,
+                sistema: sistema,
+                status: status,
+                dataColheitaPrevisao: dataColheitaPrevisao.toISOString().split('T')[0]
+            };
+            
+            plantas.push(planta);
+            atualizarTabelaPlantas();
+            atualizarDashboard();
+            
+            // Limpar formulário
+            document.getElementById('dataPlantio').value = '';
+            document.getElementById('tipoPlanta').value = '';
+        }
+        
+        function atualizarTabelaPlantas() {
+            const tbody = document.getElementById('corpoPlantas');
+            
+            if (plantas.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 40px; color: #999;">
+                            Nenhuma planta registrada. Adicione sua primeira planta acima! 🌱
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = plantas.map(p => {
+                const hoje = new Date();
+                const plantio = new Date(p.dataPlantio);
+                const diasPlantado = Math.floor((hoje - plantio) / (1000 * 60 * 60 * 24));
+                
+                let statusClass = 'status-germinando';
+                if (p.status === 'Crescendo') statusClass = 'status-crescendo';
+                if (p.status === 'Pronto') statusClass = 'status-pronto';
+                
+                return `
+                    <tr>
+                        <td>${new Date(p.dataPlantio).toLocaleDateString('pt-BR')}</td>
+                        <td><strong>${p.nome}</strong></td>
+                        <td>${p.sistema}</td>
+                        <td>${diasPlantado} dias</td>
+                        <td>${new Date(p.dataColheitaPrevisao).toLocaleDateString('pt-BR')}</td>
+                        <td><span class="status-badge ${statusClass}">${p.status}</span></td>
+                        <td>
+                            <button class="btn btn-secondary" style="font-size: 12px; padding: 5px 10px;" onclick="removerPlanta(${p.id})">
+                                🗑️ Remover
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        function removerPlanta(id) {
+            if (confirm('Deseja realmente remover esta planta?')) {
+                plantas = plantas.filter(p => p.id !== id);
+                atualizarTabelaPlantas();
+                atualizarDashboard();
+            }
+        }
+        
+        // REGISTRAR COLHEITA
+        function registrarColheita() {
+            const data = document.getElementById('dataColheita').value;
+            const planta = document.getElementById('plantaColhida').value;
+            const quantidade = document.getElementById('quantidadeColhidaReg').value;
+            const qualidade = document.getElementById('qualidadeColheita').value;
+            const observacoes = document.getElementById('observacoesColheita').value;
+            
+            if (!data || !planta || !quantidade) {
+                alert('Preencha todos os campos obrigatórios!');
+                return;
+            }
+            
+            const colheita = {
+                id: Date.now(),
+                data: data,
+                planta: planta,
+                quantidade: quantidade,
+                qualidade: qualidade,
+                observacoes: observacoes
+            };
+            
+            colheitas.push(colheita);
+            atualizarTabelaColheitas();
+            atualizarDashboard();
+            
+            // Limpar formulário
+            document.getElementById('dataColheita').value = '';
+            document.getElementById('plantaColhida').value = '';
+            document.getElementById('quantidadeColhidaReg').value = '';
+            document.getElementById('observacoesColheita').value = '';
+        }
+        
+        function atualizarTabelaColheitas() {
+            const tbody = document.getElementById('corpoColheitas');
+            
+            if (colheitas.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 40px; color: #999;">
+                            Nenhuma colheita registrada ainda. Registre sua primeira colheita acima! 🌱
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = colheitas.map(c => `
+                <tr>
+                    <td>${new Date(c.data).toLocaleDateString('pt-BR')}</td>
+                    <td><strong>${c.planta}</strong></td>
+                    <td>${c.quantidade}</td>
+                    <td>${c.qualidade}</td>
+                    <td>${c.observacoes || '-'}</td>
+                    <td>
+                        <button class="btn btn-secondary" style="font-size: 12px; padding: 5px 10px;" onclick="removerColheita(${c.id})">
+                            🗑️
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        function removerColheita(id) {
+            if (confirm('Deseja realmente remover este registro?')) {
+                colheitas = colheitas.filter(c => c.id !== id);
+                atualizarTabelaColheitas();
+                atualizarDashboard();
+            }
+        }
+        
+        // CALCULAR ECONOMIA
+        function calcularEconomia() {
+            const produto = document.getElementById('produtoEconomia').value;
+            const quantidade = parseFloat(document.getElementById('quantidadeColhida').value);
+            
+            if (!produto || !quantidade) {
+                alert('Preencha o produto e quantidade!');
+                return;
+            }
+            
+            const [nome, preco] = produto.split('|');
+            const precoUnitario = parseFloat(preco);
+            const economiaTotal = quantidade * precoUnitario;
+            
+            document.getElementById('qtdColhidaTexto').textContent = quantidade;
+            document.getElementById('produtoColhidoTexto').textContent = nome;
+            document.getElementById('economiaValor').textContent = `R$ ${economiaTotal.toFixed(2)}`;
+            document.getElementById('resultadoEconomia').style.display = 'block';
+            
+            economia.push({
+                produto: nome,
+                quantidade: quantidade,
+                precoMercado: precoUnitario,
+                economia: economiaTotal
+            });
+            
+            atualizarResumoEconomia();
+        }
+        
+        function atualizarResumoEconomia() {
+            const tbody = document.getElementById('resumoEconomia');
+            
+            if (economia.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 30px; color: #999;">
+                            Nenhum cálculo registrado ainda
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = economia.map(e => {
+                // Define unidade correta baseada no produto
+                let unidade = 'kg';
+                if (e.produto === 'Alface') unidade = 'un';
+                if (e.produto === 'Rúcula' || e.produto === 'Manjericão' || e.produto === 'Hortelã') unidade = 'maço';
+                
+                return `
+                <tr>
+                    <td>${e.produto}</td>
+                    <td>${e.quantidade} ${unidade}</td>
+                    <td>R$ ${e.precoMercado.toFixed(2)}/${unidade}</td>
+                    <td><strong style="color: #00a878;">R$ ${e.economia.toFixed(2)}</strong></td>
+                </tr>
+            `;
+            }).join('');
+            
+            const total = economia.reduce((sum, e) => sum + e.economia, 0);
+            document.getElementById('economiaTotalMes').textContent = total.toFixed(2);
+        }
+        
+        // CALCULAR ROI
+        function calcularROI() {
+            const custoSistema = parseFloat(document.getElementById('custoSistema').value) || 0;
+            const custoIluminacao = parseFloat(document.getElementById('custoIluminacao').value) || 0;
+            const custoSementes = parseFloat(document.getElementById('custoSementes').value) || 0;
+            const custoOutros = parseFloat(document.getElementById('custoOutros').value) || 0;
+            
+            const investimentoTotal = custoSistema + custoIluminacao + custoSementes + custoOutros;
+            
+            const custoNutrientes = parseFloat(document.getElementById('custoNutrientes').value) || 0;
+            const custoEnergia = parseFloat(document.getElementById('custoEnergia').value) || 0;
+            const custoAgua = parseFloat(document.getElementById('custoAgua').value) || 0;
+            
+            const custoMensal = custoNutrientes + custoEnergia + custoAgua;
+            
+            const economiaMensal = parseFloat(document.getElementById('economiaMensalEst').value) || 0;
+            const lucroLiquido = economiaMensal - custoMensal;
+            
+            if (lucroLiquido <= 0) {
+                alert('Seus custos mensais são maiores que a economia! Revise os valores.');
+                return;
+            }
+            
+            const mesesRetorno = Math.ceil(investimentoTotal / lucroLiquido);
+            const economiaAnual = (lucroLiquido * 12);
+            const roi = ((economiaAnual - investimentoTotal) / investimentoTotal * 100);
+            
+            document.getElementById('mesesRetorno').textContent = mesesRetorno;
+            document.getElementById('economiaAnual').textContent = `R$ ${economiaAnual.toFixed(2)}`;
+            document.getElementById('percentualROI').textContent = `${roi.toFixed(0)}%`;
+            
+            const progressoAtual = Math.min((1 / mesesRetorno) * 100, 100);
+            document.getElementById('progressROI').style.width = `${progressoAtual}%`;
+            document.getElementById('progressROI').textContent = `1/${mesesRetorno} meses`;
+            document.getElementById('textoProgresso').textContent = `Você recupera seu investimento em ${mesesRetorno} meses`;
+            
+            document.getElementById('detInvestimento').textContent = investimentoTotal.toFixed(2);
+            document.getElementById('detCustoMensal').textContent = custoMensal.toFixed(2);
+            document.getElementById('detEconomiaMensal').textContent = economiaMensal.toFixed(2);
+            document.getElementById('detLucroMensal').textContent = lucroLiquido.toFixed(2);
+            document.getElementById('detMesesRetorno').textContent = mesesRetorno;
+            document.getElementById('detEconomiaAno').textContent = economiaAnual.toFixed(2);
+            document.getElementById('detROIAno').textContent = roi.toFixed(0);
+            
+            document.getElementById('resultadoROI').style.display = 'block';
+        }
+        
+        // ATUALIZAR DASHBOARD
+        function atualizarDashboard() {
+            const plantasAtivas = plantas.filter(p => p.status !== 'Colhido').length;
+            const colhidasMes = colheitas.length;
+            const economiaMensal = economia.reduce((sum, e) => sum + e.economia, 0);
+            const taxaSucesso = plantas.length > 0 ? ((colheitas.length / plantas.length) * 100).toFixed(0) : 0;
+            
+            document.getElementById('plantasAtivas').textContent = plantasAtivas;
+            document.getElementById('colhidasMes').textContent = colhidasMes;
+            document.getElementById('economiaMensal').textContent = `R$ ${economiaMensal.toFixed(0)}`;
+            document.getElementById('taxaSucesso').textContent = `${taxaSucesso}%`;
+        }
+        
+        // ATUALIZAR CUSTOS EM TEMPO REAL
+        document.querySelectorAll('#custoSistema, #custoIluminacao, #custoSementes, #custoOutros').forEach(input => {
+            input.addEventListener('input', () => {
+                const total = 
+                    (parseFloat(document.getElementById('custoSistema').value) || 0) +
+                    (parseFloat(document.getElementById('custoIluminacao').value) || 0) +
+                    (parseFloat(document.getElementById('custoSementes').value) || 0) +
+                    (parseFloat(document.getElementById('custoOutros').value) || 0);
+                document.getElementById('investimentoTotal').textContent = total.toFixed(2);
+            });
+        });
+        
+        document.querySelectorAll('#custoNutrientes, #custoEnergia, #custoAgua').forEach(input => {
+            input.addEventListener('input', () => {
+                const total = 
+                    (parseFloat(document.getElementById('custoNutrientes').value) || 0) +
+                    (parseFloat(document.getElementById('custoEnergia').value) || 0) +
+                    (parseFloat(document.getElementById('custoAgua').value) || 0);
+                document.getElementById('custoMensal').textContent = total.toFixed(2);
+                
+                const economia = parseFloat(document.getElementById('economiaMensalEst').value) || 0;
+                const lucro = economia - total;
+                document.getElementById('lucroLiquido').textContent = lucro.toFixed(2);
+            });
+        });
+        
+        document.getElementById('economiaMensalEst').addEventListener('input', () => {
+            const custo = 
+                (parseFloat(document.getElementById('custoNutrientes').value) || 0) +
+                (parseFloat(document.getElementById('custoEnergia').value) || 0) +
+                (parseFloat(document.getElementById('custoAgua').value) || 0);
+            const economia = parseFloat(document.getElementById('economiaMensalEst').value) || 0;
+            const lucro = economia - custo;
+            document.getElementById('lucroLiquido').textContent = lucro.toFixed(2);
+        });
+        
+        // INICIALIZAR
+        atualizarDashboard();
+    </script>
+
+</body>
+</html>
+                
